@@ -471,7 +471,7 @@ class MultiTerm extends AbstractQuery
                       $this->_weights[$termId]->getValue() *
                       $reader->norm($docId, $term->field);
             */
-            if (isset($this->_termsFreqs[$termId][$docId]) && $this->_allowTermsWithNullFreq == 1) {
+            if ($this->_allowTermsWithNullFreq == 0 || isset($this->_termsFreqs[$termId][$docId])) {
                 $score += $reader->getSimilarity()->tf($this->_termsFreqs[$termId][$docId]) *
                 $this->_weights[$termId]->getValue() *
                 $reader->norm($docId, $term->field);                      
