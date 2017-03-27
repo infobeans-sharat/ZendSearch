@@ -83,6 +83,15 @@ class MultiTerm extends AbstractQuery
 
 
     /**
+     * Show terms with null frequency in the output.
+     * integer
+     *
+     * @var int
+     */
+    private $_allowTermsWithNullFreq = 1;
+
+
+    /**
      * Class constructor.  Create a new multi-term query object.
      *
      * if $signs array is omitted then all terms are required
@@ -457,9 +466,19 @@ class MultiTerm extends AbstractQuery
              * We don't need to check that term freq is not 0
              * Score calculation is performed only for matched docs
              */
+            /*
             $score += $reader->getSimilarity()->tf($this->_termsFreqs[$termId][$docId]) *
                       $this->_weights[$termId]->getValue() *
                       $reader->norm($docId, $term->field);
+            */
+            if (isset($this->_termsFreqs[$termId][$docId]) && $this->_allowTermsWithNullFreq == 1) {
+                $score += $reader->getSimilarity()->tf($this->_termsFreqs[$termId][$docId]) *
+                $this->_weights[$termId]->getValue() *
+                $reader->norm($docId, $term->field);                      
+            } else {
+                $score += $this->_weights[$termId]->getValue() *
+                $reader->norm($docId, $term->field);
+            }
         }
 
         return $score * $this->_coord * $this->getBoost();
